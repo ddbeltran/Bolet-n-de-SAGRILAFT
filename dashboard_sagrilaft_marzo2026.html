@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard SAGRILAFT - Marzo 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #f0c040;
+  --gold-dim: #a07820;
+  --red: #ff4444;
+  --orange: #ff8800;
+  --yellow: #ffc107;
+  --bg: #080808;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --bg4: #222222;
+  --border: #2a2a2a;
+  --text: #e0e0e0;
+  --text-dim: #888;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+
+.header {
+  background: linear-gradient(180deg, #0f0f0f 0%, #080808 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 30px 18px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.header-left h1 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--gold); letter-spacing: 2px; text-transform: uppercase;
+}
+.header-left p { color: var(--text-dim); font-size: 13px; margin-top: 4px; letter-spacing: 1px; }
+.header-badge {
+  background: #1a0a0a; border: 1px solid #ff4444; border-radius: 6px;
+  padding: 8px 16px; text-align: center;
+}
+.header-badge span { display: block; color: #ff4444; font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+.header-badge strong { color: #ff8888; font-size: 15px; font-family: 'Rajdhani', sans-serif; }
+
+.kpis { display: flex; flex-wrap: wrap; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.kpi { flex: 1; min-width: 140px; padding: 18px 24px; border-right: 1px solid var(--border); }
+.kpi:last-child { border-right: none; }
+.kpi-val { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; }
+.kpi-val.red { color: var(--red); }
+.kpi-label { color: var(--text-dim); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+.kpi-sub { font-size: 11px; color: #555; margin-top: 2px; }
+
+.tabs { display: flex; flex-wrap: wrap; background: var(--bg2); border-bottom: 2px solid var(--border); padding: 0 10px; }
+.tab {
+  padding: 13px 20px; cursor: pointer; color: var(--text-dim);
+  font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.risk-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); }
+.tab[data-risk="alto"] .risk-dot { background: var(--red); }
+.tab[data-risk="medio"] .risk-dot { background: var(--yellow); }
+
+.content { display: none; padding: 24px 24px 30px; animation: fadeIn 0.2s; }
+.content.active-content { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.country-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px; margin-bottom: 22px;
+  padding-bottom: 18px; border-bottom: 1px solid var(--border);
+}
+.country-title { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+.country-subtitle { color: var(--text-dim); font-size: 12px; margin-top: 3px; }
+.risk-badge { padding: 6px 14px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.risk-alto { background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.4); color: var(--red); }
+.risk-medio { background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.4); color: var(--yellow); }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.col-span-2 { grid-column: span 2; }
+
+.card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
+.card-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+
+.news-item { background: var(--bg4); border: 1px solid var(--border); border-left: 3px solid var(--gold-dim); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; }
+.news-item:last-child { margin-bottom: 0; }
+.news-date { font-size: 10px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.news-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 600; color: #eee; margin-bottom: 6px; }
+.news-body { color: #aaa; font-size: 13px; line-height: 1.55; margin-bottom: 10px; }
+.news-link { font-size: 11px; color: var(--gold-dim); word-break: break-all; }
+.news-link a { color: var(--gold-dim); text-decoration: none; }
+.news-link a:hover { color: var(--gold); text-decoration: underline; }
+
+.alert-list { list-style: none; }
+.alert-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: #bbb; display: flex; align-items: flex-start; gap: 8px; }
+.alert-list li:last-child { border-bottom: none; }
+.alert-list li::before { content: "▸"; color: var(--red); flex-shrink: 0; margin-top: 1px; }
+.alert-list.yellow li::before { color: var(--yellow); }
+
+.rec-list { list-style: none; }
+.rec-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: #bbb; display: flex; align-items: flex-start; gap: 8px; }
+.rec-list li:last-child { border-bottom: none; }
+.rec-list li::before { content: "✓"; color: #4caf50; flex-shrink: 0; }
+
+.stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat-box { flex: 1; min-width: 100px; background: var(--bg4); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; text-align: center; }
+.stat-box .val { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+.stat-box .lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; margin: 2px; }
+.tag-red { background: rgba(255,68,68,0.15); color: var(--red); border: 1px solid rgba(255,68,68,0.3); }
+.tag-yellow { background: rgba(255,193,7,0.15); color: var(--yellow); border: 1px solid rgba(255,193,7,0.3); }
+.tag-gold { background: rgba(240,192,64,0.12); color: var(--gold); border: 1px solid rgba(240,192,64,0.3); }
+
+.section-label { font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+
+.conclusion-card { background: linear-gradient(135deg, #1a1000 0%, #1a1a1a 100%); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; }
+.conclusion-card h4 { color: var(--gold); font-family: 'Rajdhani', sans-serif; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.conclusion-card p { color: #bbb; font-size: 13px; line-height: 1.6; }
+
+.footer { text-align: center; padding: 18px; border-top: 1px solid var(--border); background: var(--bg2); color: var(--text-dim); font-size: 12px; letter-spacing: 1px; }
+.footer strong { color: var(--gold); }
+
+@media(max-width: 900px) { .grid, .grid-3 { grid-template-columns: 1fr; } .col-span-2 { grid-column: span 1; } }
+@media(max-width: 600px) { .header { padding: 16px; } .kpi { padding: 14px 16px; } .tab { padding: 11px 10px; font-size: 12px; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>⚠ Dashboard SAGRILAFT</h1>
+    <p>Minería Ilegal — Lavado de Activos en Latinoamérica | Marzo 2026</p>
+  </div>
+  <div class="header-badge">
+    <span>Riesgo Regional</span>
+    <strong>NIVEL CRÍTICO</strong>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-val">55%</div><div class="kpi-label">Lavado vía minería — Perú</div><div class="kpi-sub">Mayor que cualquier otra fuente</div></div>
+  <div class="kpi"><div class="kpi-val">USD 8.4B</div><div class="kpi-label">Minería ilegal — Colombia</div><div class="kpi-sub">Supera al narcotráfico</div></div>
+  <div class="kpi"><div class="kpi-val">$731B COP</div><div class="kpi-label">Red desmantelada</div><div class="kpi-sub">Proveedores ficticios sector minero</div></div>
+  <div class="kpi"><div class="kpi-val red">6</div><div class="kpi-label">Países en alerta</div><div class="kpi-sub">PE · CO · NI · EC · CL · MX</div></div>
+  <div class="kpi"><div class="kpi-val red">ALTO</div><div class="kpi-label">Riesgo Regional</div><div class="kpi-sub">Patrón transnacional confirmado</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-risk="alto" onclick="openTab(event,'peru')"><span class="risk-dot"></span>🇵🇪 Perú</div>
+  <div class="tab" data-risk="alto" onclick="openTab(event,'colombia')"><span class="risk-dot"></span>🇨🇴 Colombia</div>
+  <div class="tab" data-risk="alto" onclick="openTab(event,'nicaragua')"><span class="risk-dot"></span>🇳🇮 Nicaragua</div>
+  <div class="tab" data-risk="alto" onclick="openTab(event,'ecuador')"><span class="risk-dot"></span>🇪🇨 Ecuador</div>
+  <div class="tab" data-risk="medio" onclick="openTab(event,'chile')"><span class="risk-dot"></span>🇨🇱 Chile</div>
+  <div class="tab" data-risk="alto" onclick="openTab(event,'mexico')"><span class="risk-dot"></span>🇲🇽 México</div>
+  <div class="tab" data-risk="medio" onclick="openTab(event,'conclusiones')"><span class="risk-dot"></span>📊 Conclusiones</div>
+</div>
+
+<!-- PERÚ -->
+<div id="peru" class="content active-content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇵🇪 Perú</div>
+      <div class="country-subtitle">Principal foco regional de lavado vía minería ilegal — 2 alertas críticas en marzo 2026</div>
+    </div>
+    <span class="risk-badge risk-alto">Riesgo ALTO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">55%</div><div class="lbl">Del lavado total</div></div>
+    <div class="stat-box"><div class="val">2</div><div class="lbl">Alertas marzo</div></div>
+    <div class="stat-box"><div class="val">Madre de Dios</div><div class="lbl">Zona crítica</div></div>
+    <div class="stat-box"><div class="val">Puno</div><div class="lbl">Zona crítica</div></div>
+  </div>
+  <div class="section-label">Noticias y alertas — Marzo 2026</div>
+  <div class="news-item">
+    <div class="news-date">03 de marzo de 2026</div>
+    <div class="news-title">Minería ilegal concentra más del 50% del lavado de activos</div>
+    <div class="news-body">Un informe oficial reveló que la minería ilegal representa aproximadamente el 55% de los fondos vinculados a lavado de activos en Perú, consolidándose como la principal fuente de blanqueo por encima de otras economías criminales, incluido el narcotráfico. Las estructuras identificadas operan principalmente mediante comercializadoras informales y redes de exportación con documentación falsificada.</div>
+    <div class="news-link">🔗 <a href="https://www.business-humanrights.org/es/últimas-noticias/perú-informe-revela-que-más-de-la-mitad-de-los-fondos-detectados-por-lavado-de-activos-provienen-de-la-minería-ilegal-con-graves-efectos-económicos-y-sociales/" target="_blank">business-humanrights.org</a></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">13 de marzo de 2026</div>
+    <div class="news-title">Oro ilegal como principal motor del lavado de activos</div>
+    <div class="news-body">Investigaciones señalan que la minería ilegal se ha convertido en el principal motor del lavado de activos en Perú, con estructuras criminales que integran de forma vertical la extracción, transporte y exportación del mineral. La integración de estas cadenas dificulta la trazabilidad y permite el blanqueo en múltiples eslabones simultáneos.</div>
+    <div class="news-link">🔗 <a href="https://odevida.pares.com.co/2026/03/13/" target="_blank">odevida.pares.com.co</a></div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list">
+        <li>Omisión de controles de origen de minerales</li>
+        <li>Uso de comercializadoras para blanqueo de fondos</li>
+        <li>Evasión tributaria y falsedad documental</li>
+        <li>Integración vertical criminal (extracción–exportación)</li>
+        <li>Uso de empresas fachada sin capacidad real</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Debida diligencia reforzada a proveedores mineros</li>
+        <li>Verificación de licencias REINFO y formalización vigente</li>
+        <li>Monitoreo de operaciones inusuales por volumen vs. capacidad declarada</li>
+        <li>Segmentación de clientes por riesgo geográfico (Madre de Dios, Puno)</li>
+        <li>Implementación de trazabilidad del mineral desde origen</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-red">Empresas comercializadoras informales</span>
+      <span class="tag tag-red">Redes criminales organizadas</span>
+      <span class="tag tag-yellow">Exportadoras con documentación falsa</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">Los actores específicos no fueron individualizados en las fuentes oficiales; operan mediante estructuras anónimas y cambios frecuentes de razón social.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COLOMBIA -->
+<div id="colombia" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇨🇴 Colombia</div>
+      <div class="country-subtitle">Minería ilegal supera al narcotráfico — 2 alertas críticas en marzo 2026</div>
+    </div>
+    <span class="risk-badge risk-alto">Riesgo ALTO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">USD 8.4B</div><div class="lbl">Ingresos minería ilegal</div></div>
+    <div class="stat-box"><div class="val">$731B COP</div><div class="lbl">Red desmantelada</div></div>
+    <div class="stat-box"><div class="val">Supera</div><div class="lbl">Al narcotráfico</div></div>
+    <div class="stat-box"><div class="val">2</div><div class="lbl">Alertas marzo</div></div>
+  </div>
+  <div class="section-label">Noticias y alertas — Marzo 2026</div>
+  <div class="news-item">
+    <div class="news-date">15 de marzo de 2026</div>
+    <div class="news-title">Red de lavado de activos por $731.000 millones desmantelada</div>
+    <div class="news-body">Autoridades colombianas desmantelaron una red que lavó más de $731.000 millones COP mediante proveedores ficticios sin capacidad económica real, vinculados al sector minero. La operación utilizaba facturación falsa y simulación de compras de oro para justificar el origen de los recursos. Los proveedores no contaban con infraestructura, trabajadores ni registros contables coherentes con los montos transados.</div>
+    <div class="news-link">🔗 <a href="https://www.elpais.com.co/judicial/asi-operaba-la-red-de-lavado-de-activos-a-traves-de-la-mineria-en-diferentes-puntos-del-pais-1555.html" target="_blank">elpais.com.co</a></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">23 de marzo de 2026</div>
+    <div class="news-title">Minería ilegal supera al narcotráfico en ingresos — USD 8.414 millones</div>
+    <div class="news-body">Un informe reveló que la minería ilegal genera ingresos estimados de USD 8.414 millones anuales en Colombia, superando al narcotráfico. El informe detalla la financiación de grupos armados ilegales, el contrabando de oro hacia mercados internacionales y la debilidad institucional en zonas extractivas como el Chocó, Cauca y el sur de Bolívar.</div>
+    <div class="news-link">🔗 <a href="https://www.infobae.com/colombia/2026/03/23/sale-a-la-luz-informe-sobre-mineria-ilegal-de-oro-supera-al-narcotrafico-en-ingresos-en-colombia/" target="_blank">infobae.com</a></div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list">
+        <li>Uso de empresas fachada y proveedores ficticios sin capacidad real</li>
+        <li>Facturación falsa y simulación de operaciones de oro</li>
+        <li>Financiamiento de grupos armados ilegales</li>
+        <li>Contrabando de oro hacia terceros países</li>
+        <li>Debilidad institucional en zonas extractivas (Chocó, Cauca, Bolívar)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Validación de capacidad financiera real de proveedores mineros</li>
+        <li>Cruce con listas restrictivas (OFAC, ONU, UIAF)</li>
+        <li>Auditoría de operaciones comerciales recurrentes en el sector</li>
+        <li>Evaluación de riesgo territorial (zonas de conflicto armado)</li>
+        <li>Reporte de ROS a la UIAF por operaciones atípicas</li>
+        <li>Control de contrapartes en toda la cadena de suministro</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-red">Grupos armados ilegales</span>
+      <span class="tag tag-red">Proveedores ficticios</span>
+      <span class="tag tag-yellow">Exportadores de oro</span>
+      <span class="tag tag-yellow">Redes de contrabando</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">Las autoridades no revelaron los nombres de los proveedores por reserva sumarial. Se confirmó participación de estructuras criminales con presencia armada en zonas extractivas.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NICARAGUA -->
+<div id="nicaragua" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇳🇮 Nicaragua / Región Fronteriza CR–NI</div>
+      <div class="country-subtitle">Expansión de minería ilegal controlada por redes criminales transnacionales — Marzo 2026</div>
+    </div>
+    <span class="risk-badge risk-alto">Riesgo ALTO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">18 Mar</div><div class="lbl">Fecha alerta</div></div>
+    <div class="stat-box"><div class="val">CR / NI</div><div class="lbl">Frontera crítica</div></div>
+    <div class="stat-box"><div class="val">Asia</div><div class="lbl">Mercado destino reportado</div></div>
+  </div>
+  <div class="section-label">Noticias y alertas — Marzo 2026</div>
+  <div class="news-item">
+    <div class="news-date">18 de marzo de 2026</div>
+    <div class="news-title">La extracción ilegal de oro se desborda en la frontera Costa Rica–Nicaragua</div>
+    <div class="news-body">Se reporta una expansión significativa de la minería ilegal en la zona fronteriza entre Costa Rica y Nicaragua, controlada por redes criminales que integran múltiples economías ilícitas: tráfico de drogas, tráfico de armas y exportación de oro ilegal. El informe señala a compradores internacionales, con referencia particular a empresas compradoras de origen chino que adquieren mineral sin exigir certificación de origen, facilitando el blanqueo en la cadena de exportación. El uso de mercurio y otros químicos prohibidos agrava el impacto ambiental y complejiza los controles.</div>
+    <div class="news-link">🔗 <a href="https://elpais.com/america/2026-03-18/la-extraccion-ilegal-de-oro-se-desborda-en-la-frontera-entre-costa-rica-y-nicaragua-por-la-voracidad-minera-de-china.html" target="_blank">elpais.com — América</a></div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list">
+        <li>Comercialización de oro ilegal hacia mercados internacionales</li>
+        <li>Falta total de trazabilidad del mineral exportado</li>
+        <li>Uso de químicos prohibidos (mercurio) en extracción</li>
+        <li>Integración con redes de tráfico de drogas y armas</li>
+        <li>Compradores internacionales sin debida diligencia de origen</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Evaluación exhaustiva de contrapartes internacionales compradoras</li>
+        <li>Exigir certificación de origen del mineral en toda exportación</li>
+        <li>Debida diligencia ampliada en operaciones hacia mercados asiáticos</li>
+        <li>Verificar que contrapartes no estén vinculadas a redes señaladas</li>
+        <li>Monitoreo de operaciones en zonas fronterizas de alta vulnerabilidad</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-red">Redes criminales transnacionales</span>
+      <span class="tag tag-yellow">Empresas compradoras internacionales (referencia: empresas chinas)</span>
+      <span class="tag tag-red">Traficantes de drogas y armas</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">Las empresas compradoras no fueron individualizadas por nombre. La fuente referencia la demanda china como motor del mercado ilegal en la región.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ECUADOR -->
+<div id="ecuador" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇪🇨 Ecuador</div>
+      <div class="country-subtitle">Minería ilegal vinculada a terrorismo y crimen organizado — Marzo 2026</div>
+    </div>
+    <span class="risk-badge risk-alto">Riesgo ALTO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">4</div><div class="lbl">Provincias en toque de queda</div></div>
+    <div class="stat-box"><div class="val">Mar 2026</div><div class="lbl">Período de alerta</div></div>
+    <div class="stat-box"><div class="val">Múltiple</div><div class="lbl">Tipo de crimen</div></div>
+  </div>
+  <div class="section-label">Noticias y alertas — Marzo 2026</div>
+  <div class="news-item">
+    <div class="news-date">Marzo de 2026</div>
+    <div class="news-title">Intensificación del crimen organizado — Toque de queda en cuatro provincias</div>
+    <div class="news-body">El gobierno ecuatoriano intensificó medidas de seguridad extremas, incluyendo toques de queda en cuatro provincias, como respuesta a la escalada del crimen organizado que integra actividades de minería ilegal con estructuras terroristas y de financiamiento ilícito. La vinculación entre extracción ilegal de minerales y el financiamiento de grupos armados representa un riesgo sistémico para el sector financiero que opere en o con contrapartes ecuatorianas.</div>
+    <div class="news-link">🔗 <a href="https://www.huffingtonpost.es/global/toque-queda-cuatro-provincias-ecuador-guerra-crimen-organizadobr-f202603.html" target="_blank">huffingtonpost.es</a></div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list">
+        <li>Vinculación directa entre minería ilegal y terrorismo</li>
+        <li>Financiamiento ilícito de estructuras armadas</li>
+        <li>Operación en zonas sin control estatal efectivo</li>
+        <li>Riesgo de contaminación de cadenas de suministro legítimas</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Clasificar clientes y contrapartes ecuatorianas en categoría alto riesgo</li>
+        <li>Monitoreo intensificado en provincias con estado de excepción</li>
+        <li>Revisión de beneficiarios finales de empresas del sector minero</li>
+        <li>Reporte preventivo a UIAF por operaciones con origen en zonas críticas</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-red">Bandas criminales organizadas</span>
+      <span class="tag tag-red">Grupos con vínculos terroristas</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">Los actores no fueron individualizados en la fuente. La alerta aplica sobre estructuras criminales con presencia territorial en provincias en estado de excepción.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CHILE -->
+<div id="chile" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇨🇱 Chile</div>
+      <div class="country-subtitle">Riesgo emergente — Crecimiento de minería ilegal artesanal sin trazabilidad</div>
+    </div>
+    <span class="risk-badge risk-medio">Riesgo MEDIO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">Emergente</div><div class="lbl">Nivel de riesgo</div></div>
+    <div class="stat-box"><div class="val">2025–2026</div><div class="lbl">Tendencia creciente</div></div>
+    <div class="stat-box"><div class="val">Artesanal</div><div class="lbl">Escala predominante</div></div>
+  </div>
+  <div class="section-label">Contexto — 2025–2026</div>
+  <div class="news-item" style="border-left-color: var(--yellow);">
+    <div class="news-date">Contexto 2025 – 2026</div>
+    <div class="news-title">Incremento de minería ilegal artesanal — Riesgo emergente de lavado</div>
+    <div class="news-body">Aunque de menor escala comparativa con Perú o Colombia, Chile evidencia un crecimiento sostenido de la minería ilegal de oro, especialmente a través de "pirquineros" (mineros artesanales informales) que operan sin licencias, sin trazabilidad del mineral y en algunos casos conectados a redes de comercialización irregulares. El riesgo de lavado se materializa en pequeñas operaciones acumuladas que no superan umbrales de reporte pero que en conjunto representan montos significativos.</div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list yellow">
+        <li>Operaciones informales de minería sin trazabilidad documental</li>
+        <li>Ausencia de licencias de extracción y comercialización</li>
+        <li>Estructuración de operaciones pequeñas para evadir umbrales de reporte</li>
+        <li>Comercialización informal sin registro de origen del mineral</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Debida diligencia simplificada pero obligatoria para clientes del sector artesanal</li>
+        <li>Control documental riguroso del origen del mineral en toda operación</li>
+        <li>Monitoreo de patrones de estructuración (múltiples transacciones menores)</li>
+        <li>Capacitación a oficiales de cumplimiento sobre señales del sector</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-yellow">Pirquineros (mineros artesanales informales)</span>
+      <span class="tag tag-yellow">Comercializadoras informales de mineral</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">No se identifican actores de crimen organizado a gran escala en Chile para este período. El riesgo es de naturaleza emergente y estructural, asociado a la informalidad del sector artesanal.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MÉXICO -->
+<div id="mexico" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">🇲🇽 México</div>
+      <div class="country-subtitle">Riesgo latente — Minería ilegal vinculada a carteles del crimen organizado</div>
+    </div>
+    <span class="risk-badge risk-alto">Riesgo ALTO</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box"><div class="val">Latente</div><div class="lbl">Tipo de riesgo</div></div>
+    <div class="stat-box"><div class="val">Carteles</div><div class="lbl">Actor principal</div></div>
+    <div class="stat-box"><div class="val">4 estados</div><div class="lbl">Zonas críticas</div></div>
+  </div>
+  <div class="section-label">Contexto — Marzo 2026</div>
+  <div class="news-item" style="border-left-color: var(--orange);">
+    <div class="news-date">Marzo de 2026</div>
+    <div class="news-title">Riesgo latente — Minería ilegal bajo control de crimen organizado</div>
+    <div class="news-body">No se identificaron en marzo de 2026 noticias específicas de alto impacto en México. Sin embargo, México mantiene un riesgo estructural elevado: la minería ilegal en diversas regiones del país está vinculada a carteles del crimen organizado que utilizan la extracción y exportación de concentrados minerales como vehículo de lavado de activos. Las zonas de mayor riesgo incluyen Guerrero, Michoacán, Sonora y Sinaloa, donde la presencia de carteles y la minería informal coexisten con estructuras de exportación que evaden controles.</div>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">⚡ Aspectos de incumplimiento</div>
+      <ul class="alert-list">
+        <li>Control de zonas mineras por carteles del crimen organizado</li>
+        <li>Exportación de concentrados minerales con documentación fraudulenta</li>
+        <li>Lavado mediante operaciones formales con proveedores aparentemente legítimos</li>
+        <li>Corrupción institucional en zonas extractivas de alta vulnerabilidad</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">✅ Recomendaciones SAGRILAFT</div>
+      <ul class="rec-list">
+        <li>Evaluación de contrapartes en zonas con presencia confirmada de carteles</li>
+        <li>Monitoreo de exportaciones de concentrados minerales hacia destinos inusuales</li>
+        <li>Verificación de beneficiarios finales en empresas mineras mexicanas</li>
+        <li>Revisión periódica en listas de sanción OFAC y listas nacionales</li>
+        <li>Debida diligencia reforzada para estados: Guerrero, Michoacán, Sonora, Sinaloa</li>
+      </ul>
+    </div>
+    <div class="card col-span-2">
+      <div class="card-title">🏢 Actores vinculados</div>
+      <span class="tag tag-red">Carteles del crimen organizado</span>
+      <span class="tag tag-red">Operaciones mineras bajo control criminal</span>
+      <span class="tag tag-yellow">Exportadores de concentrados (zonas de riesgo)</span>
+      <p style="margin-top:10px;color:#666;font-size:12px;">Zonas de mayor atención: Guerrero, Michoacán, Sonora, Sinaloa. Sin individualizaciones específicas para marzo 2026.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONCLUSIONES -->
+<div id="conclusiones" class="content">
+  <div class="country-header">
+    <div>
+      <div class="country-title">📊 Conclusiones Regionales</div>
+      <div class="country-subtitle">Análisis de cumplimiento SAGRILAFT — Enfoque transnacional — Marzo 2026</div>
+    </div>
+    <span class="risk-badge risk-alto">Alerta Crítica Regional</span>
+  </div>
+  <div class="section-label">Hallazgo principal</div>
+  <div class="conclusion-card">
+    <h4>La minería ilegal de oro supera al narcotráfico como vehículo de lavado</h4>
+    <p>La minería ilegal de oro es actualmente uno de los principales vehículos de lavado de activos en Latinoamérica, superando incluso al narcotráfico en países como Colombia (USD 8.414M) y representando el 55% de los fondos lavados en Perú. Esta tendencia es sostenida, transnacional y con capacidad de afectar directamente a entidades del sector financiero con exposición al sector minero o a jurisdicciones de alto riesgo.</p>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">🔴 Tipologías transversales</div>
+      <ul class="alert-list">
+        <li>Empresas fachada sin capacidad económica real</li>
+        <li>Comercializadoras sin infraestructura ni personal</li>
+        <li>Exportaciones con documentación falsa o alterada</li>
+        <li>Integración vertical criminal (extracción → transporte → exportación)</li>
+        <li>Estructuras jurídicas complejas para ocultar beneficiarios finales</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🔗 Correlaciones de alto riesgo</div>
+      <ul class="alert-list">
+        <li>Alta correlación con grupos armados y estructuras terroristas</li>
+        <li>Crimen organizado transnacional (carteles, bandas, redes)</li>
+        <li>Corrupción institucional en zonas extractivas</li>
+        <li>Compradores internacionales sin controles de trazabilidad</li>
+        <li>Zonas de conflicto como origen geográfico del mineral</li>
+      </ul>
+    </div>
+  </div>
+  <div class="section-label">Mapa de riesgo por país</div>
+  <div class="grid-3">
+    <div class="card" style="border-top: 3px solid var(--red);">
+      <div class="card-title">🇵🇪 Perú</div>
+      <span class="tag tag-red">ALTO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">55% del lavado. Principal foco. Madre de Dios y Puno como zonas críticas.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--red);">
+      <div class="card-title">🇨🇴 Colombia</div>
+      <span class="tag tag-red">ALTO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">USD 8.4B. Supera narcotráfico. Red de $731B desmantelada. Grupos armados.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--red);">
+      <div class="card-title">🇳🇮 Nicaragua</div>
+      <span class="tag tag-red">ALTO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">Expansión fronteriza. Redes transnacionales. Compradores sin controles de origen.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--red);">
+      <div class="card-title">🇪🇨 Ecuador</div>
+      <span class="tag tag-red">ALTO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">Toque de queda en 4 provincias. Nexo minería–terrorismo confirmado.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--yellow);">
+      <div class="card-title">🇨🇱 Chile</div>
+      <span class="tag tag-yellow">MEDIO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">Riesgo emergente. Pirquineros informales. Sin crimen organizado a gran escala aún.</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--red);">
+      <div class="card-title">🇲🇽 México</div>
+      <span class="tag tag-red">ALTO</span>
+      <p style="font-size:12px;color:#aaa;margin-top:8px;">Riesgo latente. Carteles controlan zonas mineras. Guerrero, Michoacán, Sonora.</p>
+    </div>
+  </div>
+  <div class="section-label">Obligaciones de cumplimiento SAGRILAFT para entidades expuestas</div>
+  <div class="card">
+    <ul class="rec-list">
+      <li>Implementar debida diligencia reforzada para todos los clientes y contrapartes del sector minero en los seis países identificados</li>
+      <li>Verificar en listas restrictivas (OFAC, ONU, UIAF, Interpol) a toda contraparte minera antes de iniciar relación comercial</li>
+      <li>Exigir documentación de trazabilidad y origen del mineral en operaciones de compra, exportación o financiamiento</li>
+      <li>Reportar operaciones inusuales a la UIAF mediante ROS cuando existan señales de alerta descritas en este informe</li>
+      <li>Segmentar geográficamente el portafolio de clientes mineros, asignando categoría de alto riesgo a los de zonas críticas</li>
+      <li>Revisar beneficiarios finales de empresas mineras para detectar vinculación con PEPs o personas sancionadas</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>CAPTE — Cultura Ética</strong> &nbsp;|&nbsp; Dashboard SAGRILAFT — Minería Ilegal &nbsp;|&nbsp; Marzo 2026 &nbsp;|&nbsp; Uso interno — Confidencial
+</div>
+
+<script>
+function openTab(evt, tabName) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active-content'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active-content');
+  evt.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>
